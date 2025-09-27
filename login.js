@@ -1,7 +1,7 @@
 // Simple login credentials
 const users = {
-  "admin": "1234",
-  "dfs": "pass@2025"
+  "divyanshu": "Dibang@2880",
+  "girish": "Dibang@2880"
 };
 
 function loginUser() {
@@ -19,3 +19,4 @@ function loginUser() {
     errorMsg.style.display = "block";
   }
 }
+
