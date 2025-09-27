@@ -1,11 +1,52 @@
 const scriptURL = "https://script.google.com/macros/s/AKfycbx3LYxmRfKwyCCnK5ol5vKZFbI0GVWjA9vfKBaA_ba7C3XNTg_FCg3Tg0od3uhHJUIPtg/exec";
 let allData = [];
-let currentFront = null; // track selected front
+let currentFront = null;
+let currentDrawing = null;
+
+// Update breadcrumb
+function updateBreadcrumb() {
+  const bc = document.getElementById("breadcrumb");
+  let html = `<a href="#" onclick="showFronts()">Home</a>`;
+
+  if (currentFront) {
+    html += ` → <a href="#" onclick="showDrawings('${currentFront}')">${currentFront}</a>`;
+  }
+  if (currentDrawing) {
+    html += ` → ${currentDrawing}`;
+  }
+  bc.innerHTML = html;
+}
+
+// Show all fronts
+function showFronts() {
+  currentFront = null;
+  currentDrawing = null;
+  renderFronts();
+  document.getElementById("cardContainer").innerHTML = "";
+  updateBreadcrumb();
+}
+
+// Show drawings in a front
+function showDrawings(frontName) {
+  currentFront = frontName;
+  currentDrawing = null;
+  showCardsByFront(frontName);
+  updateBreadcrumb();
+}
+
+// Show revisions of a drawing
+function showRevisions(drawingNumber) {
+  currentDrawing = drawingNumber;
+  updateBreadcrumb();
+  // Right now revisions open in new tabs (window.open)
+  // If you want them inline, you can add a new container & render them here
+}
 
 // Fetch data on load
 document.addEventListener("DOMContentLoaded", async () => {
   await fetchData();
   renderFronts();
+  updateBreadcrumb();
 });
 
 // Fetch Google Sheet Data
@@ -14,7 +55,6 @@ async function fetchData() {
     const res = await fetch(scriptURL);
     const data = await res.json();
 
-    // Convert rows to objects
     allData = data.map(row => ({
       slNo: row[0],
       front: row[1],
@@ -32,9 +72,11 @@ async function fetchData() {
   }
 }
 
-// Render unique fronts as buttons
+// Render unique fronts as buttons (sorted alphabetically)
 function renderFronts() {
-  const fronts = [...new Set(allData.map(item => item.front))];
+  let fronts = [...new Set(allData.map(item => item.front))];
+  fronts = fronts.sort((a, b) => a.localeCompare(b)); // ✅ sort alphabetically
+
   const frontContainer = document.getElementById("frontContainer");
   const cardContainer = document.getElementById("cardContainer");
   frontContainer.innerHTML = "";
@@ -51,27 +93,35 @@ function renderFronts() {
     frontContainer.appendChild(btn);
   });
 }
+/* Render unique fronts as buttons
+function renderFronts() {
+  const fronts = [...new Set(allData.map(item => item.front))];
+  const frontContainer = document.getElementById("frontContainer");
+  const cardContainer = document.getElementById("cardContainer");
+  frontContainer.innerHTML = "";
+  cardContainer.innerHTML = "";
+
+  fronts.forEach(front => {
+    const btn = document.createElement("button");
+    btn.textContent = front;
+    btn.className = "front-btn";
+    btn.addEventListener("click", () => {
+      showDrawings(front);
+    });
+    frontContainer.appendChild(btn);
+  });
+}*/
 
 // Show cards for selected front
 function showCardsByFront(front) {
   const frontContainer = document.getElementById("frontContainer");
   const cardContainer = document.getElementById("cardContainer");
 
-  frontContainer.innerHTML = ""; // remove other fronts
+  frontContainer.innerHTML = "";
   cardContainer.innerHTML = "";
 
-  // Add Back button
-  const backBtn = document.createElement("button");
-  backBtn.textContent = "⬅ Back to Fronts";
-  backBtn.className = "front-btn";
-  backBtn.style.background = "#888";
-  backBtn.addEventListener("click", () => {
-    currentFront = null;
-    renderFronts();
-  });
-  frontContainer.appendChild(backBtn);
-
-  renderCards(allData.filter(d => d.front === front));
+  const drawings = allData.filter(d => d.front === front);
+  renderCards(drawings);
 }
 
 // Render cards helper
@@ -86,6 +136,7 @@ function renderCards(drawings) {
     const header = document.createElement("div");
     header.className = "card-header";
     header.innerHTML = `<strong>${drawing.drawingNo}</strong><br>${drawing.details}`;
+    header.addEventListener("click", () => showRevisions(drawing.drawingNo));
 
     const revisions = document.createElement("div");
     revisions.className = "revision-icons";
@@ -97,7 +148,10 @@ function renderCards(drawings) {
           icon.className = "rev-icon";
           icon.title = `Revision ${index}`;
           icon.textContent = `R${index}`;
-          icon.addEventListener("click", () => window.open(url, "_blank"));
+          icon.addEventListener("click", e => {
+            e.stopPropagation(); // prevent header click
+            window.open(url, "_blank");
+          });
           revisions.appendChild(icon);
         }
       });
@@ -108,13 +162,12 @@ function renderCards(drawings) {
   });
 }
 
-// Search functionality (global + inside front)
+// Search functionality
 document.getElementById("searchInput").addEventListener("input", e => {
   const query = e.target.value.toLowerCase();
 
   let results;
   if (currentFront) {
-    // search inside selected front
     results = allData.filter(
       d =>
         d.front === currentFront &&
@@ -122,7 +175,6 @@ document.getElementById("searchInput").addEventListener("input", e => {
          d.details.toLowerCase().includes(query))
     );
   } else {
-    // global search
     results = allData.filter(
       d =>
         d.drawingNo.toLowerCase().includes(query) ||
