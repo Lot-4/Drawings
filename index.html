@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Drawing Viewer by Front</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Login Screen -->
+  <div id="loginScreen" class="login-screen">
+    <div class="login-box">
+      <h2>🔒 Drawing Viewer Login</h2>
+      <input type="text" id="loginUser" placeholder="Login ID" />
+      <input type="password" id="loginPass" placeholder="Password" />
+      <button onclick="loginUser()">Login</button>
+      <p id="loginError" class="error"></p>
+      <div class="loader"></div>
+    </div>
+  </div>
+
+  <!-- App Content (hidden until login) -->
+  <div id="appContainer" style="display:none;">
+    <header>
+      <h1>📁 Drawing Viewer</h1>
+      <input type="text" id="searchInput" placeholder="Search by Drawing No. or Title..." />
+    </header>
+
+    <div id="frontContainer" class="front-container"></div>
+    <div id="cardContainer" class="card-container"></div>
+  </div>
+
+  <script src="login.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
