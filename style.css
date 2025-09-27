@@ -90,11 +90,13 @@ header h1 {
 }
 
 /* Fronts (Collapsible) */
+
 .front-container {
-  padding: 15px;
+  padding: 10px;
   background: #fff;
   box-shadow: 0 1px 4px rgba(0,0,0,0.1);
 }
+
 
 .accordion {
   background: #0066cc;
@@ -158,4 +160,55 @@ header h1 {
 }
 .rev-icon:hover {
   background: #3e8e41;
+}
+/* Responsive, black & golden styled front buttons */
+.front-btn {
+  flex: 1 1 calc(25% - 20px); /* 4 per row on large screens */
+  min-width: 120px;
+  max-width: 200px;
+  height: 70px;
+  font-size: 1.1rem;
+  margin: 10px;
+  border-radius: 12px;
+  background: rgb(148, 205, 223);
+  color: rgb(7, 4, 27);
+  border: 2px solid rgb(24, 20, 2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.front-btn:hover {
+  background: rgb(49, 139, 161);
+  color: black;
+  transform: scale(1.05);
+}
+
+/* Make grid responsive */
+#frontContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Medium screens → 2 per row */
+@media (max-width: 900px) {
+  .front-btn {
+    flex: 1 1 calc(45% - 20px);
+    height: 100px;
+    font-size: 1rem;
+  }
+}
+
+/* Small screens → 1 per row */
+@media (max-width: 500px) {
+  .front-btn {
+    flex: 1 1 100%;
+    height: 80px;
+    font-size: 0.9rem;
+  }
 }
