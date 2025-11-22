@@ -1,7 +1,12 @@
 // Simple login credentials
 const users = {
   "divyanshu": "Dibang@2880",
-  "girish": "Dibang@2880"
+  "girish": "Dibang@2880",
+  "satwik": "Dibang@2880",
+  "hansraj": "Dibang@2880",
+  "asish": "Dibang@2880",
+  "jitendra": "Dibang@2880",
+  "manoj": "Dibang@2880"
 };
 
 function loginUser() {
@@ -19,4 +24,5 @@ function loginUser() {
     errorMsg.style.display = "block";
   }
 }
+
 
